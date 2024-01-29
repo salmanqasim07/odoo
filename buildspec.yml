@@ -1,0 +1,40 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - sudo apt-get update
+      - sudo apt-get upgrade
+      - sudo apt-get install -y git python3.9 postgresql nano virtualenv xz-utils wget fontconfig libfreetype6 libx11-6 libxext6 libxrender1 node-less node-clean-css xfonts-75dpi
+      - wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb
+      - sudo dpkg -i wkhtmltox_0.12.5-1.bionic_amd64.deb
+      - sudo apt install -f
+      - sudo apt-get update
+      - sudo apt-get upgrade
+      - sudo add-apt-repository ppa:deadsnakes/ppa
+      - sudo apt install software-properties-common
+      - sudo apt install python3.9
+      - sudo apt-get install -y gcc python3.9 python3.9-dev libxml2-dev libxslt1-dev libevent-dev libsasl2-dev libldap2-dev libpq-dev libpng-dev libjpeg-dev
+      - sudo apt-get update
+      - sudo apt-get upgrade
+      - sudo -u postgres createuser --createdb $(whoami)
+      - createdb $(whoami)
+      - sudo apt-get update
+      - sudo apt-get upgrade
+  build:
+    commands:
+      - cd /
+      - mkdir OdooCP
+      - sudo chmod -R 777 OdooCP
+      - cd OdooCP
+      - mkdir src env
+      - cd src
+      - git clone -b 17.0 --single-branch https://github.com/odoo/odoo.git
+      - cd ../env/
+      - virtualenv -p python3.9 OdooCP
+      - source OdooCP/bin/activate
+      - pip3 install -r ../src/odoo/requirements.txt
+      - ../src/odoo/odoo-bin -sc env/OdooCP/config/odoocp.conf
+      - ../src/odoo/odoo-bin -c env/OdooCP/config/odoocp.conf -i base
